@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Waktu Mobile Legends</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: url('https://images.unsplash.com/photo-1610563166150-b34df4f3b01d?q=80&w=2070&auto=format&fit=crop') no-repeat center/cover;
+            color: #fff;
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #1a1a2e;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            max-width: 500px;
+            width: 100%;
+            backdrop-filter: blur(5px);
+        }
+        h1 {
+            font-size: 2em;
+            color: #00f2ff;
+            text-shadow: 0 0 10px #00f2ff;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            text-align: left;
+            margin: 10px 0 5px;
+            color: #e0e0e0;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #00f2ff;
+            border-radius: 8px;
+            background: #2a2a4e;
+            color: #fff;
+            font-size: 1em;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #ff00ff;
+            box-shadow: 0 0 10px #ff00ff;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(45deg, #00f2ff, #ff00ff);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px #ff00ff;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            color: #e0e0e0;
+            font-size: 1em;
+            line-height: 1.5;
+        }
+
+        /* Responsif untuk mobile */
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+                margin: 10px;
+            }
+            h1 {
+                font-size: 1.5em;
+            }
+            input, button {
+                font-size: 0.9em;
+                padding: 8px;
+            }
+            label {
+                font-size: 0.9em;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>Kalkulator Waktu Mobile Legends</h1>
+        <div>
+            <label for="matches">Jumlah Match:</label>
+            <input type="number" id="matches" min="1" placeholder="Contoh: 602" required>
+        </div>
+        <div>
+            <label for="minutesPerMatch">Menit per Match:</label>
+            <input type="number" id="minutesPerMatch" min="1" placeholder="Contoh: 17" value="17" required>
+        </div>
+        <div>
+            <label for="startDate">Tanggal Mulai Season:</label>
+            <input type="date" id="startDate" required>
+        </div>
+        <div>
+            <label for="endDate">Tanggal Terakhir Main:</label>
+            <input type="date" id="endDate" required>
+        </div>
+        <button onclick="calculate()">Start Battle</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // Set default tanggal
+        window.onload = function() {
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+            
+            // Default: 20 Maret 2025 dan 23 April 2025
+            const defaultStartDate = new Date('2025-03-20');
+            const defaultEndDate = new Date('2025-04-23');
+            
+            // Format tanggal untuk input type="date" (YYYY-MM-DD)
+            startDateInput.value = defaultStartDate.toISOString().split('T')[0];
+            endDateInput.value = defaultEndDate.toISOString().split('T')[0];
+        };
+
+        function calculate() {
+            // Ambil input
+            const matches = parseInt(document.getElementById('matches').value);
+            const minutesPerMatch = parseInt(document.getElementById('minutesPerMatch').value);
+            const startDate = new Date(document.getElementById('startDate').value);
+            const endDate = new Date(document.getElementById('endDate').value);
+
+            // Validasi input
+            if (isNaN(matches) || matches <= 0) {
+                document.getElementById('result').innerHTML = "Masukkan jumlah match yang valid!";
+                return;
+            }
+            if (isNaN(minutesPerMatch) || minutesPerMatch <= 0) {
+                document.getElementById('result').innerHTML = "Masukkan menit per match yang valid!";
+                return;
+            }
+            if (!startDate || !endDate || startDate > endDate) {
+                document.getElementById('result').innerHTML = "Masukkan tanggal season yang valid!";
+                return;
+            }
+
+            // Hitung jumlah hari (inklusif)
+            const timeDiff = endDate - startDate;
+            const totalDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)) + 1; // +1 untuk inklusif
+
+            // Hitung total menit
+            const totalMinutes = matches * minutesPerMatch;
+
+            // Konversi ke jam
+            const totalHours = totalMinutes / 60;
+            const days = Math.floor(totalHours / 24);
+            const remainingHours = Math.floor(totalHours % 24);
+            const remainingMinutes = Math.round(totalMinutes % 60);
+
+            // Hitung rata-rata jam per hari
+            const avgHoursPerDay = totalHours / totalDays;
+            const avgHours = Math.floor(avgHoursPerDay);
+            const avgMinutes = Math.round((avgHoursPerDay - avgHours) * 60);
+
+            // Tampilkan hasil
+            document.getElementById('result').innerHTML = `
+                <strong>Total Hari Season:</strong> ${totalDays} hari<br>
+                <strong>Total Waktu Battle:</strong> ${days} hari, ${remainingHours} jam, ${remainingMinutes} menit<br>
+                <strong>Rata-rata per Hari:</strong> ${avgHours} jam, ${avgMinutes} menit
+            `;
+        }
+    </script>
+</body>
+</html>
